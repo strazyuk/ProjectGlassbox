@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.user import User
-from app.schemas.user import UserCreate, UserUpdate
-from app.core.security import get_password_hash
+from .models import User
+from .schemas import UserCreate
+from .security import get_password_hash
 
 class CRUDUser:
     async def get(self, db: AsyncSession, id: int) -> User | None:

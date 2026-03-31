@@ -7,10 +7,9 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-# 1. Import your models and settings
-from app.db.base_class import Base
-from app.models.user import User  # Make sure all models are imported here
-from app.core.config import settings
+# 1. Import your models and settings from the NEW flat folder
+from app.models import Base
+from app.database import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
