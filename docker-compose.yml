@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=project_glassbox
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    # 1. 'build: .' tells Docker to use the local Dockerfile we just wrote
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    # 2. Networking: the app connects to 'db' (not localhost!) inside Docker
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/project_glassbox
+      - SECRET_KEY=replace_me_with_a_secure_key
+    volumes:
+      - .:/app
+    # 3. Ensures the database starts BEFORE the app
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
