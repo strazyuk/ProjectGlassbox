@@ -15,6 +15,7 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt .
 
 # 5. Upgrade pip and setuptools to fix vulnerabilities, then install requirements
+# hadolint ignore=DL3013
 RUN pip install --no-cache-dir --upgrade pip setuptools \
     && pip install --no-cache-dir -r requirements.txt
 

@@ -15,7 +15,7 @@ winget install Gitleaks.Gitleaks
 
 Python requirements:
 ```powershell
-pip install bandit hadolint-py
+pip install ruff bandit
 ```
 
 ## 2. Automated Pipeline
