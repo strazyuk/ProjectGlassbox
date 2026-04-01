@@ -1,0 +1,10 @@
+[allowlist]
+description = "Ignore generic examples and test data"
+paths = [
+    "tests/test_main.py",
+    "README.md",
+    ".env.example"
+]
+regexes = [
+    "test_secret_key"
+]

@@ -1,40 +1,51 @@
-name: CI/CD Pipeline
+name: DevSecOps Pipeline
 
-# 1. The Trigger: When does this workflow run?
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
-# 2. The Jobs: What major tasks should happen?
 jobs:
-  # The first job: Linting (Checking for code style)
-  lint:
+  # 1. SAST & Secret Scanning
+  security-scan:
+    name: Security & Linting
     runs-on: ubuntu-latest
     steps:
-      # Step A: Get the code from GitHub
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Important for Gitleaks to check history
 
-      # Step B: Install Python
+      - name: Gitleaks (Secret Scan)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: false
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      # Step C: Install the "Ruff" linter
       - name: Install dependencies
-        run: pip install ruff
+        run: pip install ruff bandit
 
-      # Step D: Run the linting check
-      - name: Run ruff
+      - name: Ruff (Linting)
         run: ruff check app
 
-  # The second job: Testing (Running pytest)
+      - name: Bandit (Python SAST)
+        run: bandit -r app/ -f custom
+
+      - name: Hadolint (Docker Lint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
+  # 2. Testing
   test:
+    name: Pytest & Integration
+    needs: security-scan
     runs-on: ubuntu-latest
-    
-    # 3. Service Containers: Running PostgreSQL for tests
     services:
       db:
         image: postgres:16
@@ -42,7 +53,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
           POSTGRES_DB: test_db
-        # Wait for the DB to be ready before starting tests
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -66,16 +76,46 @@ jobs:
 
       - name: Run tests
         env:
-          # Tell the app to use the test DB
           DATABASE_URL: postgresql+asyncpg://postgres:password@localhost:5432/test_db
           SECRET_KEY: test_secret_key
         run: pytest
 
-  # The third job: Build (Checking if Docker builds)
-  build:
+  # 3. Build & Container Scan (SCA)
+  build-and-scan:
+    name: Build & Image Scan
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile
+      - name: Build Docker image
+        run: docker build -t projectglassbox-app .
+
+      - name: Trivy (Container Vulnerability Scan)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'projectglassbox-app'
+          format: 'table'
+          exit-code: '1' # Fail the build on CRITICAL vulnerabilities
+          severity: 'CRITICAL,HIGH'
+
+  # 4. SBOM Generation
+  sbom:
+    name: Generate SBOM
+    needs: build-and-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Generate SBOM (format: CycloneDX)"
+        uses: anchore/sbom-action@v0
+        with:
+          image: projectglassbox-app
+          format: cyclonedx-json
+          output-file: 'sbom.json'
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json

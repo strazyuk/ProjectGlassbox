@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
 
 from .database import settings, get_db
-from .models import User
 from .schemas import User, UserCreate
 from .crud import user as user_crud
 
