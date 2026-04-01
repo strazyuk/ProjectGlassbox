@@ -165,3 +165,6 @@ postgres_data/
 # Alembic
 alembic/versions/*.pyc
 alembic/env.py.bak
+
+sbom.json
+trivy_scan_results.txt

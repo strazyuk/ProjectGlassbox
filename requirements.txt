@@ -9,5 +9,6 @@ passlib[bcrypt]
 python-multipart
 pytest
 httpx
+pytest-asyncio
 passlib
 pydantic[email]

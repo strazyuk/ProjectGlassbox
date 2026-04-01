@@ -14,8 +14,9 @@ ENV PYTHONUNBUFFERED 1
 # This is a 'trick' to speed up future builds by caching the 'pip install' step
 COPY requirements.txt .
 
-# 5. Install the project dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# 5. Upgrade pip and setuptools to fix vulnerabilities, then install requirements
+RUN pip install --no-cache-dir --upgrade pip setuptools \
+    && pip install --no-cache-dir -r requirements.txt
 
 # 6. Copy the rest of your application code into the container
 COPY . .
