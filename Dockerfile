@@ -7,7 +7,7 @@ WORKDIR /app
 # 2.1 Upgrade specific vulnerable OS packages (glibc, systemd)
 # ncurses CVEs are suppressed via .trivyignore as they cannot be removed (util-linux dependency)
 # hadolint ignore=DL3008,DL3009
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --only-upgrade -y \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --only-upgrade --no-install-recommends -y \
     libc6 libc-bin libsystemd0 libudev1 \
     && rm -rf /var/lib/apt/lists/*
 
