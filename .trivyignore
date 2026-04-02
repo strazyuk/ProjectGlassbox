@@ -8,3 +8,7 @@ CVE-2026-4046
 # ncurses buffer overflow - no fix available in current stable (Bookworm/Trixie)
 # Mitigation: ncurses packages removed from Dockerfile where possible.
 CVE-2025-69720
+
+# Waiting for upstream Debian patch for libsystemd0/libudev1
+# systemd is not used as an init system in this container
+CVE-2026-29111
