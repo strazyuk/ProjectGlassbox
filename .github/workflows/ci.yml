@@ -80,7 +80,7 @@ jobs:
           SECRET_KEY: test_secret_key
         run: python -m pytest
 
-  # 3. Build & Container Scan (SCA)
+  # 3. Build, Scan & SBOM
   build-and-scan:
     name: Build & Image Scan
     needs: test
@@ -98,14 +98,6 @@ jobs:
           format: 'table'
           exit-code: '1' # Fail the build on CRITICAL vulnerabilities
           severity: 'CRITICAL,HIGH'
-
-  # 4. SBOM Generation
-  sbom:
-    name: Generate SBOM
-    needs: build-and-scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
       - name: "Generate SBOM (format: CycloneDX)"
         uses: anchore/sbom-action@v0
