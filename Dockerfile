@@ -2,8 +2,14 @@
 FROM python:3.12-slim
 
 # 2. Set the working directory inside the container
-# All subsequent commands will run inside this folder
 WORKDIR /app
+
+# 2.1 Apply OS-level security patches and remove unnecessary vulnerable tools (Phase 1)
+# hadolint ignore=DL3008,DL3009,DL3015
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get remove --purge -y ncurses-bin ncurses-base libncursesw6 libtinfo6 \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # 3. Set environment variables to keep Python behavior clean in Docker
 # Prevents Python from writing .pyc files and ensures output is sent straight to the logs
@@ -22,9 +28,12 @@ RUN pip install --no-cache-dir --upgrade pip setuptools \
 # 6. Copy the rest of your application code into the container
 COPY . .
 
-# 7. Inform Docker that the app will listen on port 8000
+# 7. Create a non-privileged user and switch to it for runtime (Phase 5)
+RUN useradd -r -u 1001 appuser
+USER appuser
+
+# 8. Inform Docker that the app will listen on port 8000
 EXPOSE 8000
 
-# 8. Define the command to run your app
-# 0.0.0.0 allows the app to be accessible from outside the container
+# 9. Define the command to run your app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,10 @@
+# Known unfixable OS vulnerabilities - monitored for upstream patches
+# Last reviewed: 2026-04-02
+
+# glibc Denial of Service via iconv() - fix_deferred in Debian
+# Mitigation: Application does not use iconv() for untrusted character sets.
+CVE-2026-4046
+
+# ncurses buffer overflow - no fix available in current stable (Bookworm/Trixie)
+# Mitigation: ncurses packages removed from Dockerfile where possible.
+CVE-2025-69720
