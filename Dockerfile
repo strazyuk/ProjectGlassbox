@@ -4,9 +4,10 @@ FROM python:3.12-slim
 # 2. Set the working directory inside the container
 WORKDIR /app
 
-# 2.1 Apply OS-level security patches and remove unnecessary vulnerable tools (Phase 1)
+# 2.1 Apply targeted security patches for specific OS vulnerabilities (Phase 1)
 # hadolint ignore=DL3008,DL3009,DL3015
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install --only-upgrade -y \
+    libc6 libc-bin libsystemd0 libudev1 \
     && apt-get remove --purge -y ncurses-bin ncurses-base libncursesw6 libtinfo6 \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
