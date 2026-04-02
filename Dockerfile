@@ -6,15 +6,15 @@ WORKDIR /app
 
 # 2.1 Apply OS-level security patches and remove unnecessary vulnerable tools (Phase 1)
 # hadolint ignore=DL3008,DL3009,DL3015
-RUN apt-get update && apt-get upgrade -y \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
     && apt-get remove --purge -y ncurses-bin ncurses-base libncursesw6 libtinfo6 \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Set environment variables to keep Python behavior clean in Docker
 # Prevents Python from writing .pyc files and ensures output is sent straight to the logs
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # 4. Copy only the requirements file first
 # This is a 'trick' to speed up future builds by caching the 'pip install' step
