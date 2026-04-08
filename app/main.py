@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends, HTTPException
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any
 
@@ -7,6 +7,24 @@ from .schemas import User, UserCreate
 from .crud import user as user_crud
 
 app = FastAPI(title=settings.PROJECT_NAME)
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    # Prevent MIME-type sniffing
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    # Prevent Clickjacking
+    response.headers["X-Frame-Options"] = "DENY"
+    # Harden Cross-Origin Resource Policy
+    response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+    # Address storable/cacheable content for sensitive API data
+    if "Cache-Control" not in response.headers:
+        response.headers["Cache-Control"] = (
+            "no-store, no-cache, must-revalidate, max-age=0"
+        )
+    return response
+
 
 api_router = APIRouter()
 

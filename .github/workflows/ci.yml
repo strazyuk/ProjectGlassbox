@@ -117,6 +117,9 @@ jobs:
     name: OWASP ZAP (DAST Scan)
     needs: build-and-scan
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
     services:
       db:
         image: postgres:16
@@ -156,7 +159,7 @@ jobs:
         with:
           target: 'http://localhost:8000'
           fail_action: true
-          # rules_file_name: '.zap/rules.tsv' # Optional configuration
+          allow_issue_writing: true
 
       - name: Upload ZAP Report
         if: always()
