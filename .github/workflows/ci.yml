@@ -144,7 +144,7 @@ jobs:
           docker build -t projectglassbox-app .
           # Run container with --network host so it can reach the postgres service on localhost
           docker run -d --network host -e DATABASE_URL=$DATABASE_URL -e SECRET_KEY=$SECRET_KEY projectglassbox-app
-          
+
           echo "Waiting for app to start..."
           timeout 60s bash -c 'until curl -s http://localhost:8000 > /dev/null; do sleep 2; done'
 

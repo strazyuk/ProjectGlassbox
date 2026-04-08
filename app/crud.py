@@ -4,6 +4,7 @@ from .models import User
 from .schemas import UserCreate
 from .security import get_password_hash
 
+
 class CRUDUser:
     async def get(self, db: AsyncSession, id: int) -> User | None:
         result = await db.execute(select(User).where(User.id == id))
@@ -24,5 +25,6 @@ class CRUDUser:
         await db.commit()
         await db.refresh(db_obj)
         return db_obj
+
 
 user = CRUDUser()

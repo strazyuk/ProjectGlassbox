@@ -10,11 +10,10 @@ app = FastAPI(title=settings.PROJECT_NAME)
 
 api_router = APIRouter()
 
+
 @api_router.post("/users/", response_model=User)
 async def create_user(
-    *,
-    db: AsyncSession = Depends(get_db),
-    user_in: UserCreate
+    *, db: AsyncSession = Depends(get_db), user_in: UserCreate
 ) -> Any:
     """
     Create new user.
@@ -27,7 +26,9 @@ async def create_user(
         )
     return await user_crud.create(db, obj_in=user_in)
 
+
 app.include_router(api_router, prefix="/api/v1", tags=["users"])
+
 
 @app.get("/")
 async def root():
