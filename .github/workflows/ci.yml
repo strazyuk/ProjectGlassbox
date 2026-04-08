@@ -148,6 +148,9 @@ jobs:
           echo "Waiting for app to start..."
           timeout 60s bash -c 'until curl -s http://localhost:8000 > /dev/null; do sleep 2; done'
 
+      - name: Fix Workspace Permissions for ZAP
+        run: sudo chmod -R a+w .
+
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
         with:
